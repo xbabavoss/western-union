@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey responses</title>
+    <link rel="stylesheet" href="{% static 'western/style.css' %}">
+    <style>
+        .dash-wrap { max-width: 920px; margin: 0 auto; padding: 24px 18px 48px; }
+        .dash-wrap h1 { font-size: 1.35rem; margin: 0 0 6px; }
+        .dash-wrap .sub { color: var(--wu-muted); margin: 0 0 22px; font-size: 0.92rem; }
+        .dash-row {
+            border: 1px solid var(--wu-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            background: #fff;
+        }
+        .dash-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.88rem; color: #444; margin-bottom: 10px; }
+        .dash-meta strong { color: #111; }
+        .dash-form textarea {
+            width: 100%;
+            min-height: 72px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+        .dash-form .actions { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .dash-sent { font-size: 0.85rem; color: #0e6b3f; font-weight: 600; }
+        .wu-btn-sm { width: auto; padding: 9px 18px; font-size: 0.92rem; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="dash-wrap">
+        <h1>Visitor survey</h1>
+        <p class="sub">Send a short thank-you or confirmation message. Visitors see it after they submit the form.</p>
+        {% if error %}
+        <p style="color:#b00020;font-weight:600;margin-bottom:14px;">{{ error }}</p>
+        {% endif %}
+
+        {% for s in submissions %}
+        <div class="dash-row">
+            <div class="dash-meta">
+                <span><strong>Name:</strong> {{ s.display_name }}</span>
+                <span><strong>Email:</strong> {{ s.contact_email }}</span>
+                <span><strong>Submitted:</strong> {{ s.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            {% if s.admin_message %}
+            <p class="dash-sent">Message sent to visitor</p>
+            {% endif %}
+            <form class="dash-form" method="post" action="{% url 'western:survey-dashboard' %}">
+                {% csrf_token %}
+                <input type="hidden" name="submission_id" value="{{ s.id }}">
+                <label class="wu-modal__eyebrow" for="msg-{{ s.id }}">Response to show on site</label>
+                <textarea id="msg-{{ s.id }}" name="admin_message" placeholder="e.g. Thank you for completing the survey.">{{ s.admin_message }}</textarea>
+                <div class="actions">
+                    <button type="submit" class="wu-btn wu-btn-sm">Send to visitor</button>
+                </div>
+            </form>
+        </div>
+        {% empty %}
+        <p>No submissions yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Template Preview</title>
+    <link rel="stylesheet" href="{% static 'western/style.css' %}">
+</head>
+<body class="receipt-preview-page">
+    <div class="receipt-phone-frame">
+        <div class="receipt-brand">
+            <img
+                src="https://www.westernunion.com/content/dam/wu/logo/logo.wu.big.svg"
+                alt="Western Union"
+            >
+        </div>
+
+        <div class="receipt-success-pill">
+            <span class="receipt-success-pill__icon">✓</span>
+            <span>Transfer Successful</span>
+        </div>
+
+        <section class="receipt-card receipt-card--amount">
+            <p class="receipt-label">AMOUNT TRANSFERRED</p>
+            <p class="receipt-amount"><span>USD</span> {{ receipt.amount_sent|floatformat:0 }}</p>
+            <p class="receipt-subtext">Instant digital transfer</p>
+        </section>
+
+        <section class="receipt-card receipt-card--meta">
+            <div class="receipt-row"><span>Sent By:</span><strong>{{ receipt.sender_name }}</strong></div>
+            <div class="receipt-row"><span>Recipient:</span><strong>{{ receipt.recipient_name }}</strong></div>
+            <div class="receipt-row"><span>Date:</span><strong>{{ receipt.transfer_date|date:"M j, Y" }}</strong></div>
+            <div class="receipt-row"><span>Reference:</span><strong>{{ receipt.reference_code }}</strong></div>
+        </section>
+
+        <section class="receipt-card receipt-card--qr">
+            <h2>Scan QR Code to Receive Funds</h2>
+            {% if receipt.qr_code_image %}
+                <img src="{{ receipt.qr_code_image.url }}" alt="Receipt QR code" class="receipt-qr-image">
+            {% else %}
+                <div class="receipt-qr-placeholder">Upload QR image in admin</div>
+            {% endif %}
+            <p>Scan with banking app to complete</p>
+        </section>
+    </div>
+</body>
+</html>

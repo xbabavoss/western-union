@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="icon" type="image/jpeg" href="https://www.westernunion.com/content/dam/wu/logo/logo.wu.big.svg">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Western Union | Receive Money">
+    <meta property="og:description" content="Western Union | Receive Money">
+    <meta property="og:image" content="https://www.westernunion.com/content/dam/wu/logo/logo.wu.big.svg">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Western Union">
+    <meta property="og:locale" content="en_US">
+
+    <title>{% block title %}Western Union Recieve{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    >
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        referrerpolicy="no-referrer"
+    >
+    <link rel="stylesheet" href="{% static 'western/style.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <a class="logo-link" href="https://www.westernunion.com/">
+                <img
+                    class="wu-logo-img"
+                    src="https://www.westernunion.com/content/dam/wu/logo/logo.wu.big.svg"
+                    alt="Western Union logo"
+                >
+            </a>
+        </header>
+
+        <main class="app-main">
+            <section class="experience-grid">
+                <article class="transfer-card">
+                    {% block card_content %}{% endblock %}
+                </article>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Follow Western Union</p>
+            <nav class="social-links" aria-label="Western Union social media links">
+                <a href="https://www.facebook.com/westernunion" target="_blank" rel="noopener noreferrer" aria-label="Western Union on Facebook">
+                    <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                </a>
+                <a href="https://www.instagram.com/westernunion" target="_blank" rel="noopener noreferrer" aria-label="Western Union on Instagram">
+                    <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                </a>
+                <a href="https://www.youtube.com/c/westernunion" target="_blank" rel="noopener noreferrer" aria-label="Western Union on YouTube">
+                    <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+                </a>
+                <a href="https://twitter.com/WesternUnion" target="_blank" rel="noopener noreferrer" aria-label="Western Union on X / Twitter">
+                    <i class="fa-brands fa-x-twitter" aria-hidden="true"></i>
+                </a>
+            </nav>
+        </footer>
+    </div>
+</body>
+</html>

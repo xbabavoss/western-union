@@ -1,0 +1,22 @@
+{% extends 'western/base.html' %}
+
+{% block title %}Transfer Received{% endblock %}
+
+{% block card_content %}
+<p class="wu-tag wu-tag-success">Transfer status</p>
+<h1>Payment ready for collection</h1>
+<p class="wu-amount">{{ currency }} {{ amount }}</p>
+
+<div class="wu-details">
+    <p><span>Status</span><strong>{{ status }}</strong></p>
+    <p><span>Collection fee</span><strong>{{ currency }} {{ fee }}</strong></p>
+    <p><span>Reference</span><strong>{{ mtcn }}</strong></p>
+</div>
+
+<div class="wu-next-step">
+    <h2>Next step after clicking Receive</h2>
+    <p>Present your MTCN and national ID at the nearest Western Union agent to collect the cash.</p>
+</div>
+
+<a href="{% url 'western:transfer-alert' %}" class="wu-btn wu-btn-alt">Done</a>
+{% endblock %}

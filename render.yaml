@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: junior-app
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn junior.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
