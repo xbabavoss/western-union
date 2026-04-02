@@ -13,7 +13,7 @@ from .models import SurveySubmission, TransferReceiptTemplate
 TRANSFER_DATA = {
     "sender": "Amina Yusuf",
     "amount": "15,000",
-    "currency": "KES",
+    "currency": "USD",
     "mtcn": "908 274 1164",
     "country": "United Arab Emirates",
 }
@@ -23,10 +23,22 @@ def _staff_required(view_func):
     return user_passes_test(lambda u: u.is_authenticated and u.is_staff)(view_func)
 
 
+def _transfer_context_from_template():
+    receipt = TransferReceiptTemplate.get_solo()
+    context = {
+        **TRANSFER_DATA,
+        "sender": receipt.sender_name,
+        "recipient_name": receipt.recipient_name,
+        "amount": f"{receipt.amount_sent:,.0f}",
+        "currency": "USD",
+    }
+    return context
+
+
 @require_http_methods(["GET"])
 def transfer_alert(request):
     context = {
-        **TRANSFER_DATA,
+        **_transfer_context_from_template(),
         "survey_submit_url": reverse("western:survey-submit"),
     }
     return render(request, "western/transfer_alert.html", context)
@@ -35,7 +47,7 @@ def transfer_alert(request):
 @require_http_methods(["POST"])
 def receive_transfer(request):
     context = {
-        **TRANSFER_DATA,
+        **_transfer_context_from_template(),
         "status": "Ready for cash pickup",
         "fee": "0",
     }

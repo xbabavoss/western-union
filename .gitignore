@@ -5,8 +5,6 @@ __pycache__/
 # Virtual env
 .venv/
 
-# Database
-db.sqlite3
 
 # Static
 staticfiles/
