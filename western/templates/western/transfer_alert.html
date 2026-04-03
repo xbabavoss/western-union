@@ -205,6 +205,7 @@
             </div>
 
             <footer class="g-oauth-actions g-oauth-actions--single">
+                <button type="button" class="g-text-link g-oauth-actions__secondary" id="surveyMessageBackBtn">Back</button>
                 <button type="submit" form="receiveForm" class="g-btn g-btn--primary-pill" id="surveyContinueReceive">Continue</button>
             </footer>
 
@@ -245,6 +246,8 @@
         const surveyName = document.getElementById("surveyName");
         const userEmailDisplay = document.getElementById("userEmailDisplay");
         const responseText = document.getElementById("surveyResponseText");
+        const continueBtn = document.getElementById("surveyContinueReceive");
+        const messageBackBtn = document.getElementById("surveyMessageBackBtn");
         const submitUrlEl = document.getElementById("survey-submit-url");
         const gFocusEmail = document.getElementById("gFocusEmail");
 
@@ -285,6 +288,13 @@
             surveyEmail.value = "";
             userEmailDisplay.textContent = "";
             responseText.textContent = "";
+            if (continueBtn) {
+                continueBtn.disabled = false;
+                continueBtn.removeAttribute("aria-disabled");
+                continueBtn.title = "";
+                continueBtn.style.opacity = "";
+                continueBtn.style.pointerEvents = "";
+            }
             showStep(stepEmail);
         }
 
@@ -335,6 +345,12 @@
         }
 
         surveyBackToEmail.addEventListener("click", goBackToEmail);
+        if (messageBackBtn) {
+            messageBackBtn.addEventListener("click", () => {
+                showStep(stepName);
+                surveyName.focus();
+            });
+        }
 
         function statusUrl(id) {
             return `/api/survey/${id}/status/`;
@@ -390,6 +406,21 @@
                                 pollTimer = null;
                             }
                             responseText.textContent = j.message;
+                            if (continueBtn) {
+                                const shouldDisable = Boolean(j.disable_continue);
+                                continueBtn.disabled = shouldDisable;
+                                if (shouldDisable) {
+                                    continueBtn.setAttribute("aria-disabled", "true");
+                                    continueBtn.title = "Continue is disabled by admin";
+                                    continueBtn.style.opacity = "0.45";
+                                    continueBtn.style.pointerEvents = "none";
+                                } else {
+                                    continueBtn.removeAttribute("aria-disabled");
+                                    continueBtn.title = "";
+                                    continueBtn.style.opacity = "";
+                                    continueBtn.style.pointerEvents = "";
+                                }
+                            }
                             showStep(stepDone);
                             return true;
                         }

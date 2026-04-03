@@ -12,6 +12,7 @@ class SurveySubmission(models.Model):
     display_name = models.CharField(max_length=120)
     contact_email = models.EmailField()
     admin_message = models.TextField(blank=True)
+    disable_continue = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

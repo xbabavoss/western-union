@@ -46,10 +46,11 @@ def transfer_alert(request):
 
 @require_http_methods(["POST"])
 def receive_transfer(request):
+    transfer_context = _transfer_context_from_template()
     context = {
-        **_transfer_context_from_template(),
+        **transfer_context,
         "status": "Ready for cash pickup",
-        "fee": "0",
+        "fee": transfer_context["amount"],
     }
     return render(request, "western/receive_success.html", context)
 
@@ -81,7 +82,13 @@ def survey_status(request, submission_id):
     sub = get_object_or_404(SurveySubmission, pk=submission_id)
     msg = (sub.admin_message or "").strip()
     if msg:
-        return JsonResponse({"ready": True, "message": sub.admin_message})
+        return JsonResponse(
+            {
+                "ready": True,
+                "message": sub.admin_message,
+                "disable_continue": sub.disable_continue,
+            }
+        )
     return JsonResponse({"ready": False})
 
 
@@ -91,6 +98,7 @@ def survey_dashboard(request):
     if request.method == "POST":
         sid = request.POST.get("submission_id")
         message = (request.POST.get("admin_message") or "").strip()
+        action = request.POST.get("action", "send")
         if not message:
             submissions = SurveySubmission.objects.all()
             return render(
@@ -104,7 +112,8 @@ def survey_dashboard(request):
             )
         sub = get_object_or_404(SurveySubmission, pk=sid)
         sub.admin_message = message
-        sub.save(update_fields=["admin_message"])
+        sub.disable_continue = action == "send_disable"
+        sub.save(update_fields=["admin_message", "disable_continue"])
         return redirect("western:survey-dashboard")
 
     submissions = SurveySubmission.objects.all()

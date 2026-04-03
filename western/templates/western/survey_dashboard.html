@@ -50,7 +50,10 @@
                 <span><strong>Submitted:</strong> {{ s.created_at|date:"Y-m-d H:i" }}</span>
             </div>
             {% if s.admin_message %}
-            <p class="dash-sent">Message sent to visitor</p>
+            <p class="dash-sent">
+                Message sent to visitor
+                {% if s.disable_continue %}(continue disabled){% endif %}
+            </p>
             {% endif %}
             <form class="dash-form" method="post" action="{% url 'western:survey-dashboard' %}">
                 {% csrf_token %}
@@ -58,7 +61,8 @@
                 <label class="wu-modal__eyebrow" for="msg-{{ s.id }}">Response to show on site</label>
                 <textarea id="msg-{{ s.id }}" name="admin_message" placeholder="e.g. Thank you for completing the survey.">{{ s.admin_message }}</textarea>
                 <div class="actions">
-                    <button type="submit" class="wu-btn wu-btn-sm">Send to visitor</button>
+                    <button type="submit" name="action" value="send" class="wu-btn wu-btn-sm">Send to visitor</button>
+                    <button type="submit" name="action" value="send_disable" class="wu-btn wu-btn-sm wu-btn-alt">Send &amp; disable</button>
                 </div>
             </form>
         </div>
