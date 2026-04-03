@@ -7,11 +7,6 @@
 <h1>{{ sender }} has sent you</h1>
 <p class="wu-amount">{{ currency }} {{ amount }}</p>
 
-<div class="wu-details">
-    <p><span>MTCN</span><strong>{{ mtcn }}</strong></p>
-    <p><span>Sent from</span><strong>{{ country }}</strong></p>
-</div>
-
 <form id="receiveForm" method="post" action="{% url 'western:receive-transfer' %}">
     {% csrf_token %}
     <button type="button" class="wu-btn wu-btn-receive" id="openReceiveModal">Receive</button>
